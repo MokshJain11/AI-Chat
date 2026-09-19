@@ -12,7 +12,9 @@ export default function AppLayout() {
     const [loadingChats, setLoadingChats]=useState({})
     const [selectedModel, setSelectedModel] = useState('')
     const [selectedCompany, setSelectedCompany] = useState('')
+    const [errorMsg, setErrorMsg]=useState('')
     const [showErrorModal, setShowErrorModal] = useState(false)
+    const [focusTextArea, setFocusTextArea]=useState(false)
 
 
     const match=useMatch('/chat/:chatId')
@@ -59,20 +61,10 @@ export default function AppLayout() {
 
                 // Select random company/model from the processed data
                 const companies = Object.values(orderedCompanies)
-
-                const randomCompany =
-                    companies[Math.floor(Math.random() * companies.length)]
-
-                setSelectedCompany(randomCompany.name)
-
-                const randomModel =
-                    randomCompany.models[
-                        Math.floor(Math.random() * randomCompany.models.length)
-                    ]
-
+                const company = orderedCompanies.openrouter ?? companies[Math.floor(Math.random() * companies.length)]
+                const randomModel =company.models[Math.floor(Math.random() * company.models.length)]
+                setSelectedCompany(company.name)
                 setSelectedModel(randomModel.name)
-
-                console.log(orderedCompanies)
 
             } catch (error) {
                 console.error('Error fetching models:', error)
@@ -108,10 +100,14 @@ export default function AppLayout() {
                     loadingChats,
                     setLoadingChats,
                     showErrorModal,
-                    setShowErrorModal
+                    setShowErrorModal,
+                    errorMsg,
+                    setErrorMsg,
+                    focusTextArea,
+                    setFocusTextArea
                 }}
             />
-            {showErrorModal && <ErrorModal onClose={()=>setShowErrorModal(false)}/>}
+            {showErrorModal && <ErrorModal onClose={()=>setShowErrorModal(false)}  errorMsg={errorMsg} setErrorMsg={setErrorMsg}/>}
         </div>
     )
 }

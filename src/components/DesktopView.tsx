@@ -1,9 +1,9 @@
 import SidebarMenu from "./SidebarMenu"
 import Form from "./Form"
 import Conversation from "./Conversation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function DesktopView({isSidebarOpen, setIsSidebarOpen, currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal}){
+export default function DesktopView({isSidebarOpen, setIsSidebarOpen, currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal, errorMsg, setErrorMsg, focusTextArea, setFocusTextArea}){
 
 
     const [btnSelected, setBtnSelected]=useState('')
@@ -44,18 +44,19 @@ export default function DesktopView({isSidebarOpen, setIsSidebarOpen, currentCha
     //         "Are black holes real? "
     //     ]
     // }
+
     const draftKey=currentChat?.id ??'new-chat'
 
     const btnClass=(btnName)=>` ${btnSelected===btnName? 'text-pink-50 bg-[rgb(162,59,103)] hover:bg-[#d56698] active:bg-[rgb(162,59,103)]':''} flex gap-2 text-sm justify-center items-center text-[#585858]/90 bg-[#dbdbdb]/30 hover:bg-[#c9c9c9]/40 font-semibold rounded-4xl px-5 py-2 border-b border-gray-300`
     
     function handleClick(e){
         setBtnSelected('')
-        console.log('clicked')
         const text=e.currentTarget.textContent?? ''
         setDrafts(prevDrafts=>({
             ...prevDrafts,
             [draftKey]:text
         }))
+        setFocusTextArea(true)
     }
 
     return(
@@ -146,7 +147,7 @@ export default function DesktopView({isSidebarOpen, setIsSidebarOpen, currentCha
                         <Conversation currentChat={currentChat} loadingChats={loadingChats}/>
                     ) 
                 }
-            <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData} drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats}  selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel}  showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal}/>
+            <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData} drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats}  selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel}  showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal} errorMsg={errorMsg} setErrorMsg={setErrorMsg}  focusTextArea={focusTextArea} setFocusTextArea={setFocusTextArea}/>
         </main>
     )
 }

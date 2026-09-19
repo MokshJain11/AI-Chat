@@ -19,7 +19,6 @@ export default function FormDropupMenu({ selectedModel, setSelectedModel, select
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
-        console.log('inside useffect of formdropupmenu')
 
         return ()=>{
             document.removeEventListener('mousedown', handleClickOutside)

@@ -9,6 +9,7 @@ export default function MainScreeen() {
         title:string,
         messages:string[],
         results:string[],
+        resultStatus:string[]
     }
 
     const {
@@ -27,7 +28,11 @@ export default function MainScreeen() {
         loadingChats,
         setLoadingChats,
         showErrorModal,
-        setShowErrorModal
+        setShowErrorModal,
+        errorMsg,
+        setErrorMsg,
+        focusTextArea,
+        setFocusTextArea
     } = useOutletContext<{
         selectedCompany:string
         setSelectedCompany:React.Dispatch<React.SetStateAction<string>>
@@ -45,6 +50,10 @@ export default function MainScreeen() {
         setLoadingChats: React.Dispatch<React.SetStateAction<Record<string, boolean>>> 
         showErrorModal:boolean
         setShowErrorModal:React.Dispatch<React.SetStateAction<boolean>>
+        errorMsg: string
+        setErrorMsg: React.Dispatch<React.SetStateAction<string>>
+        focusTextArea: boolean
+        setFocusTextArea: React.Dispatch<React.SetStateAction<boolean>>
     }>()
 
 
@@ -94,6 +103,10 @@ export default function MainScreeen() {
                 setSelectedModel={setSelectedModel}
                 showErrorModal={showErrorModal}
                 setShowErrorModal={setShowErrorModal}
+                errorMsg={errorMsg}
+                setErrorMsg={setErrorMsg}
+                focusTextArea={focusTextArea}
+                setFocusTextArea={setFocusTextArea}
             />
             : <DesktopView
                 isSidebarOpen={isSidebarOpen}
@@ -113,6 +126,10 @@ export default function MainScreeen() {
                 setSelectedModel={setSelectedModel}
                 showErrorModal={showErrorModal}
                 setShowErrorModal={setShowErrorModal}
+                errorMsg={errorMsg}
+                setErrorMsg={setErrorMsg}
+                focusTextArea={focusTextArea}
+                setFocusTextArea={setFocusTextArea}
             />
     )
 }

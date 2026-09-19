@@ -1,8 +1,10 @@
 type ErrorModalProps = {
     onClose: () => void
+    errorMsg:string
+    setErrorMsg: (message:string)=>void
 }
 
-export default function ErrorModal({ onClose }: ErrorModalProps) {
+export default function ErrorModal({ onClose, errorMsg, setErrorMsg }: ErrorModalProps) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
 
@@ -13,8 +15,7 @@ export default function ErrorModal({ onClose }: ErrorModalProps) {
                 </h2>
 
                 <p className="mt-2 text-sm text-gray-500">
-                    This model isn't available for free chat.
-                    Please select another model to continue.
+                    {errorMsg}
                 </p>
 
                 <div className="mt-6 flex justify-end">

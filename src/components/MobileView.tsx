@@ -3,7 +3,7 @@ import Form from './Form'
 import Conversation from "./Conversation"
 
 
-export default function MobileView({isSidebarOpen, setIsSidebarOpen, currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal}){
+export default function MobileView({isSidebarOpen, setIsSidebarOpen, currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal,errorMsg, setErrorMsg, focusTextArea, setFocusTextArea}){
         
     const draftKey=currentChat?.id ??'new-chat'
     return(
@@ -23,14 +23,14 @@ export default function MobileView({isSidebarOpen, setIsSidebarOpen, currentChat
                 (
                     <div className="flex flex-col flex-1 min-h-0 justify-center items-center">
                         {drafts[draftKey]==='' && <h2 className={'mb-4 text-2xl flex justify-center text-[#363636] font-semibold'}>How can I help you?</h2>}
-                        <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData}  drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats} selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel} showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal}/>        
+                        <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData}  drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats} selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel} showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal}  errorMsg={errorMsg} setErrorMsg={setErrorMsg}  focusTextArea={focusTextArea} setFocusTextArea={setFocusTextArea}/>        
                     </div>
                  
                 ) :
                 (
                     <>
                         <Conversation currentChat={currentChat} loadingChats={loadingChats}/>
-                        <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData}  drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats} selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel} showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal}/>        
+                        <Form chats={chats} setChats={setChats} currentChat={currentChat} isCompactActions={isCompactActions} modelData={modelData}  drafts={drafts} setDrafts={setDrafts} loadingChats={loadingChats} setLoadingChats={setLoadingChats} selectedCompany={selectedCompany} setSelectedCompany={setSelectedCompany} selectedModel={selectedModel} setSelectedModel={setSelectedModel} showErrorModal={showErrorModal} setShowErrorModal={setShowErrorModal}  errorMsg={errorMsg} setErrorMsg={setErrorMsg}  focusTextArea={focusTextArea} setFocusTextArea={setFocusTextArea}/>        
                     </>
                 ) 
             }

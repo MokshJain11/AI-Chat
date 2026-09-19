@@ -2,19 +2,28 @@ import { useEffect, useRef } from "react"
 import FormDropupMenu from "./FormDropupMenu"
 import { useNavigate } from "react-router-dom"
 
-export default function Form({ currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal}) {
+export default function Form({ currentChat, chats, setChats, isCompactActions, modelData, drafts, setDrafts, loadingChats, setLoadingChats, selectedCompany, setSelectedCompany, selectedModel, setSelectedModel, showErrorModal, setShowErrorModal,  errorMsg, setErrorMsg,  focusTextArea, setFocusTextArea}) {
 
     const btnClass = 'flex justify-center items-center gap-1 px-3 text-xs font-semibold text-gray-500 rounded-4xl border border-gray-200 hover:bg-[#c9c9c9]/40'    
     
     const draftKey=currentChat?.id ??'new-chat'
     const textAreaRef = useRef(null)
+    const abortControllerRef=useRef(null)
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        if(textAreaRef.current){
+    useEffect(() => {
+        if (textAreaRef.current) {
             textAreaRef.current.focus()
         }
-    },[currentChat?.id])
+    }, [currentChat?.id])
+
+    useEffect(() => {
+        if (focusTextArea && textAreaRef.current) {
+            textAreaRef.current.focus()
+            setFocusTextArea(false)
+        }
+    }, [focusTextArea])
+
     useEffect(() => {
         const textarea = textAreaRef.current
 
@@ -33,6 +42,10 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
 
     function generateChatId() {
         return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    }
+
+    function handleStop(){
+        abortControllerRef.current?.abort()
     }
 
     async function handleSubmit(e){
@@ -55,7 +68,8 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
                     id:currentChatId,
                     title:currentMsg,
                     messages:[currentMsg],
-                    results:['']
+                    results:[''],
+                    resultStatus:['generating']
                 }]
             )
             navigate(`/chat/${currentChatId}`)
@@ -67,7 +81,8 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
                         ?{
                             ...chat,
                             messages:[...chat.messages,currentMsg],
-                            results:[...chat.results,'']
+                            results:[...chat.results,''],
+                            resultStatus:[...chat.resultStatus, 'generating']
                         }
                         : chat
                 )
@@ -79,19 +94,28 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
         }))
 
         try{
-            const modelId = modelData[selectedCompany]?.models
+            const modelId = modelData[selectedCompany]?.models 
                     ?.find(m => m.name === selectedModel)?.id
-            const response= await fetch('https://ai-chat-5nyx.onrender.com/',{
+            console.log(modelId)
+            const controller=new AbortController()
+            abortControllerRef.current=controller
+            // const response= await fetch('https://ai-chat-5nyx.onrender.com/',{
+            const response= await fetch('http://localhost:3000/',{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json'
                 },
+                signal:controller.signal,
                 body: JSON.stringify({
                     message:currentMsg,
                     model:modelId
                 })      
             })
-            if(!response.ok) throw new Error(`HTTP error! Status:${response.status}`)
+            if(!response.ok){
+                const error= await response.json()
+                setErrorMsg(error.error)
+                throw new Error(`HTTP error! Status:${response.status}\n HTTP error! Message:${error.error}`)
+            } 
 
             const reader = response.body?.getReader()
 
@@ -128,31 +152,82 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
                     )
                 )
             }
+            setChats(prevChats =>
+                prevChats.map(chat =>
+                    chat.id === currentChatId
+                        ? {
+                            ...chat,
+                            resultStatus: [
+                                ...chat.resultStatus.slice(0, -1),
+                                'completed'
+                            ]
+                        }
+                        : chat
+                )
+            )
             
         }
         catch(error){
-            console.log('Error posting data: ',error)
-            setShowErrorModal(true)
 
+            if(error.name === 'AbortError'){
+
+                console.log('Generation stopped by the user')
+
+                setChats(prevChats =>
+                    prevChats.map(chat =>
+                        chat.id === currentChatId
+                            ? {
+                                ...chat,
+                                resultStatus: [
+                                    ...chat.resultStatus.slice(0, -1),
+                                    'stopped'
+                                ]
+                            }
+                            : chat
+                    )
+                )
+
+                return
+            }
+
+            console.log(error)
+
+            setChats(prevChats =>
+                prevChats.map(chat =>
+                    chat.id === currentChatId
+                        ? {
+                            ...chat,
+                            resultStatus: [
+                                ...chat.resultStatus.slice(0, -1),
+                                'error'
+                            ]
+                        }
+                        : chat
+                )
+            )
+
+            setShowErrorModal(true)
         }
         finally{
             setLoadingChats(prevLoadingChats=>({
-            ...prevLoadingChats,
-            [currentChatId]:false
-        }))
-
+                ...prevLoadingChats,
+                [currentChatId]:false
+            }))
+            abortControllerRef.current=null
         }
     }
 
-    
     function handleKeyDown(e){
-        if(e.key==='Enter'  && !e.shiftKey && drafts[draftKey]?.trim()){
+        if(e.key === 'Enter' && !e.shiftKey && loadingChats[draftKey]){
+            e.preventDefault()
+            return
+        }
+
+        if(e.key === 'Enter' && !e.shiftKey && drafts[draftKey]?.trim()){
             e.preventDefault()
             handleSubmit(e)
-            console.log('enter is pressed')
         }
     }
-
 
     return (
         <form onSubmit={handleSubmit} className={'bg-[#f7f7f7]/50 w-full min-w-0 max-h-[300px] max-w-[768px] flex flex-col mx-auto sm:border-b-0 rounded-3xl sm:rounded-b-none sm:rounded-t-3xl border-[8px] border-[#ebebeb]/80 py-3 px-1'}>
@@ -190,8 +265,9 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
                     }
                 </div>
                 <button
-                    disabled={!drafts[draftKey]?.trim()}
-                    type='submit'
+                    disabled={!loadingChats[draftKey] && !drafts[draftKey]?.trim()}
+                    type={loadingChats[draftKey] ? 'button': 'submit'}
+                    onClick={loadingChats[draftKey] ? handleStop : undefined}
                     className={`disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[rgb(162,59,103)] font-semibold bg-[rgb(162,59,103)] hover:bg-[#d56698] active:bg-[rgb(162,59,103)] ml-auto rounded-lg p-2 text-pink-50`}
                 >
                     {loadingChats[draftKey] ?
