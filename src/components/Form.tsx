@@ -99,8 +99,8 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
             console.log(modelId)
             const controller=new AbortController()
             abortControllerRef.current=controller
-            // const response= await fetch('https://ai-chat-5nyx.onrender.com/',{
-            const response= await fetch('http://localhost:3000/',{
+            const response= await fetch('https://ai-chat-5nyx.onrender.com/',{
+            // const response= await fetch('http://localhost:3000/',{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json'
