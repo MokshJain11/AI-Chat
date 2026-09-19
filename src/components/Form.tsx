@@ -81,7 +81,7 @@ export default function Form({ currentChat, chats, setChats, isCompactActions, m
         try{
             const modelId = modelData[selectedCompany]?.models
                     ?.find(m => m.name === selectedModel)?.id
-            const response= await fetch('http://localhost:3000/',{
+            const response= await fetch('https://ai-chat-5nyx.onrender.com/',{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json'

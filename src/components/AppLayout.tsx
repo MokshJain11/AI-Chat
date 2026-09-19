@@ -24,7 +24,7 @@ export default function AppLayout() {
             console.log('use effect is running')
 
             try {
-                const response = await fetch('http://localhost:3000/models')
+                const response = await fetch('https://ai-chat-5nyx.onrender.com/models')
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`)
